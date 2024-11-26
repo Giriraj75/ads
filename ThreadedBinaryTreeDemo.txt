@@ -1,0 +1,139 @@
+import java.util.Scanner;
+
+class ThreadedNode {
+    int data;
+    ThreadedNode left, right;
+    boolean isThreaded; // true if right pointer is a thread
+
+    public ThreadedNode(int data) {
+        this.data = data;
+        this.left = null;
+        this.right = null;
+        this.isThreaded = false;
+    }
+}
+
+class ThreadedBinaryTree {
+    private ThreadedNode root;
+
+    public ThreadedBinaryTree() {
+        this.root = null;
+    }
+
+    // Function to insert nodes in the threaded binary tree
+    public void insert(int data) {
+        ThreadedNode newNode = new ThreadedNode(data);
+        if (root == null) {
+            root = newNode;
+            return;
+        }
+        ThreadedNode current = root;
+        ThreadedNode parent = null;
+
+        while (true) {
+            parent = current;
+            if (data < current.data) {
+                if (current.left == null) {
+                    current.left = newNode;
+                    return;
+                }
+                current = current.left;
+            } else {
+                if (current.right == null) {
+                    current.right = newNode;
+                    return;
+                }
+                current = current.right;
+            }
+        }
+    }
+
+    // Function to create threads for in-order traversal
+    public void createThreads() {
+        createThreads(root);
+    }
+
+    private void createThreads(ThreadedNode node) {
+        if (node == null) return;
+
+        // Traverse left subtree
+        createThreads(node.left);
+
+        // If left child is null, point to the predecessor
+        if (node.left == null) {
+            node.left = getPredecessor(node);
+        }
+
+        // If right child is null, point to the successor
+        if (node.right == null) {
+            node.right = getSuccessor(node);
+            node.isThreaded = true;
+        }
+
+        // Traverse right subtree
+        createThreads(node.right);
+    }
+
+    private ThreadedNode getPredecessor(ThreadedNode node) {
+        ThreadedNode current = node.left;
+        while (current != null && current.right != null) {
+            current = current.right;
+        }
+        return current;
+    }
+
+    private ThreadedNode getSuccessor(ThreadedNode node) {
+        ThreadedNode current = node.right;
+        while (current != null && current.left != null) {
+            current = current.left;
+        }
+        return current;
+    }
+
+    // In-order traversal using threads
+    public void inOrderTraversal() {
+        ThreadedNode current = leftMost(root);
+        while (current != null) {
+            System.out.print(current.data + " ");
+            // If the current node is threaded, move to its successor
+            if (current.isThreaded) {
+                current = current.right;
+            } else {
+                current = leftMost(current.right);
+            }
+        }
+    }
+
+    private ThreadedNode leftMost(ThreadedNode node) {
+        if (node == null) return null;
+        while (node.left != null) {
+            node = node.left;
+        }
+        return node;
+    }
+}
+
+public class ThreadedBinaryTreeDemo {
+    public static void main(String[] args) {
+        ThreadedBinaryTree tree = new ThreadedBinaryTree();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter the number of nodes to insert:");
+        int n = scanner.nextInt();
+
+        System.out.println("Enter the node values:");
+        for (int i = 0; i < n; i++) {
+            int data = scanner.nextInt();
+            tree.insert(data);
+        }
+
+        // Create threads for in-order traversal
+        tree.createThreads();
+
+        // Perform in-order traversal
+        System.out.println("In-order Traversal using threads:");
+        tree.inOrderTraversal();
+
+        scanner.close();
+    }
+}

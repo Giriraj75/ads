@@ -1,0 +1,90 @@
+import java.util.Scanner;
+
+class CircularQueue {
+    private String[] queue;
+    private int front, rear, maxSize, currentSize;
+
+    public CircularQueue(int size) {
+        maxSize = size;
+        queue = new String[maxSize];
+        front = 0;
+        rear = -1;
+        currentSize = 0;
+    }
+
+    // Method to add an order to the queue
+    public void enqueue(String order) {
+        if (isFull()) {
+            System.out.println("Order queue is full. Cannot accept new orders.");
+            return;
+        }
+        rear = (rear + 1) % maxSize; // Circular increment
+        queue[rear] = order;
+        currentSize++;
+        System.out.println("Order placed: " + order);
+    }
+
+    // Method to serve an order from the queue
+    public String dequeue() {
+        if (isEmpty()) {
+            System.out.println("No orders to serve.");
+            return null;
+        }
+        String order = queue[front];
+        front = (front + 1) % maxSize; // Circular increment
+        currentSize--;
+        System.out.println("Serving order: " + order);
+        return order;
+    }
+
+    // Check if the queue is empty
+    public boolean isEmpty() {
+        return currentSize == 0;
+    }
+
+    // Check if the queue is full
+    public boolean isFull() {
+        return currentSize == maxSize;
+    }
+
+    // Get the number of current orders
+    public int size() {
+        return currentSize;
+    }
+}
+
+public class PizzaParlour {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the maximum number of orders (N): ");
+        int maxOrders = scanner.nextInt();
+        CircularQueue orderQueue = new CircularQueue(maxOrders);
+
+        while (true) {
+            System.out.println("\nPizza Parlor Menu:");
+            System.out.println("1. Place an Order");
+            System.out.println("2. Serve an Order");
+            System.out.println("3. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the order details: ");
+                    String orderDetails = scanner.nextLine();
+                    orderQueue.enqueue(orderDetails);
+                    break;
+                case 2:
+                    orderQueue.dequeue();
+                    break;
+                case 3:
+                    System.out.println("Exiting the system.");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}

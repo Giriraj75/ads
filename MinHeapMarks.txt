@@ -1,0 +1,43 @@
+import java.util.*;
+
+public class MinHeapMarks {
+
+    // Method to find the minimum and maximum marks
+    public static void findMinMaxMarks(List<Integer> marks) {
+        // Min-Heap to find the lowest marks
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+        // Add all marks to the Min-Heap
+        for (int mark : marks) {
+            minHeap.add(mark);
+        }
+
+        // The root of the Min-Heap will give the minimum mark
+        int minMark = minHeap.peek();
+        System.out.println("Lowest marks (from Min-Heap): " + minMark);
+
+        // Find the maximum marks by scanning the list (or alternatively, you could use a max heap)
+        int maxMark = Collections.max(marks);
+        System.out.println("Highest marks: " + maxMark);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Input the number of students
+        System.out.print("Enter the number of students: ");
+        int n = scanner.nextInt();
+        List<Integer> marks = new ArrayList<>();
+
+        // Input the marks of students
+        System.out.println("Enter the marks of " + n + " students:");
+        for (int i = 0; i < n; i++) {
+            marks.add(scanner.nextInt());
+        }
+
+        // Call the method to find the min and max marks
+        findMinMaxMarks(marks);
+
+        scanner.close();
+    }
+}

@@ -1,0 +1,96 @@
+import java.util.*;
+
+class path {
+    private int vertices;  // Number of vertices (locations)
+    private int[][] graph; // Adjacency matrix to represent the graph
+
+    // Constructor to initialize the graph
+    public path(int vertices) {
+        this.vertices = vertices;
+        this.graph = new int[vertices][vertices];
+    }
+
+    // Function to add an edge to the graph
+    public void addEdge(int src, int dest, int weight) {
+        graph[src][dest] = weight;
+        graph[dest][src] = weight; // Assuming an undirected graph
+    }
+
+    // Function to find the shortest paths using Dijkstra's algorithm
+    public void findShortestPaths(int start) {
+        int[] distances = new int[vertices]; // Shortest distances from the source
+        boolean[] visited = new boolean[vertices]; // Visited vertices
+
+        // Initialize distances to infinity and visited to false
+        Arrays.fill(distances, Integer.MAX_VALUE);
+        distances[start] = 0; // Distance to the start vertex is 0
+
+        for (int i = 0; i < vertices - 1; i++) {
+            // Find the vertex with the minimum distance
+            int u = findMinDistance(distances, visited);
+            visited[u] = true; // Mark as visited
+
+            // Update distances for neighbors of the selected vertex
+            for (int v = 0; v < vertices; v++) {
+                if (!visited[v] && graph[u][v] != 0 && distances[u] != Integer.MAX_VALUE
+                        && distances[u] + graph[u][v] < distances[v]) {
+                    distances[v] = distances[u] + graph[u][v];
+                }
+            }
+        }
+
+        // Print the shortest distances
+        printSolution(distances);
+    }
+
+    // Function to find the vertex with the minimum distance
+    private int findMinDistance(int[] distances, boolean[] visited) {
+        int minDistance = Integer.MAX_VALUE;
+        int minIndex = -1;
+
+        for (int v = 0; v < vertices; v++) {
+            if (!visited[v] && distances[v] < minDistance) {
+                minDistance = distances[v];
+                minIndex = v;
+            }
+        }
+
+        return minIndex;
+    }
+
+    // Function to print the shortest distances
+    private void printSolution(int[] distances) {
+        System.out.println("Vertex\tDistance from Source");
+        for (int i = 0; i < vertices; i++) {
+            System.out.println(i + "\t\t" + distances[i]);
+        }
+    }
+
+    // Main function
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of locations: ");
+        int n = scanner.nextInt();
+
+        path dijkstra = new path(n);
+
+        System.out.print("Enter the number of routes: ");
+        int routes = scanner.nextInt();
+
+        System.out.println("Enter the routes in the format (src dest weight): ");
+        for (int i = 0; i < routes; i++) {
+            int src = scanner.nextInt();
+            int dest = scanner.nextInt();
+            int weight = scanner.nextInt();
+            dijkstra.addEdge(src, dest, weight);
+        }
+
+        System.out.print("Enter the starting location: ");
+        int start = scanner.nextInt();
+
+        System.out.println("\nCalculating shortest paths...");
+        dijkstra.findShortestPaths(start);
+        scanner.close();
+    }
+}

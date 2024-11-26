@@ -1,0 +1,104 @@
+import java.util.*;
+
+class Graph {
+    private int V; // Number of cities (vertices)
+    private int[][] graph; // Adjacency matrix for road construction costs
+
+    // Constructor to initialize graph
+    public Graph(int V) {
+        this.V = V;
+        this.graph = new int[V][V];
+    }
+
+    // Function to take input for the cost of roads between cities
+    public void inputEdges() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the road construction costs between cities:");
+        for (int i = 0; i < V; i++) {
+            for (int j = i; j < V; j++) {
+                if (i == j) {
+                    graph[i][j] = 0; // No cost to connect a city to itself
+                } else {
+                    System.out.print("Enter cost for road between city " + (i + 1) + " and city " + (j + 1) + ": ");
+                    graph[i][j] = graph[j][i] = sc.nextInt();
+                }
+            }
+        }
+    }
+
+    // Function to implement Prim's algorithm for MST
+    public void primMST() {
+        int[] parent = new int[V]; // Array to store MST construction
+        int[] key = new int[V]; // Key values to pick minimum weight edge
+        boolean[] inMST = new boolean[V]; // To track vertices already included in MST
+
+        // Initialize all keys as infinite
+        Arrays.fill(key, Integer.MAX_VALUE);
+        Arrays.fill(inMST, false);
+
+        // Start with the first vertex (city 1)
+        key[0] = 0;
+        parent[0] = -1; // No parent for the starting node
+
+        // MST will have V vertices
+        for (int count = 0; count < V - 1; count++) {
+            // Pick the minimum key vertex from the set of vertices not yet processed
+            int u = minKey(key, inMST);
+
+            // Include vertex u in MST
+            inMST[u] = true;
+
+            // Update key and parent values of the adjacent vertices of the picked vertex
+            for (int v = 0; v < V; v++) {
+                if (graph[u][v] != 0 && !inMST[v] && graph[u][v] < key[v]) {
+                    parent[v] = u;
+                    key[v] = graph[u][v];
+                }
+            }
+        }
+
+        // Print the MST and its cost
+        printMST(parent);
+    }
+
+    // Function to get the vertex with minimum key value that is not yet included in MST
+    private int minKey(int[] key, boolean[] inMST) {
+        int min = Integer.MAX_VALUE;
+        int minIndex = -1;
+
+        for (int v = 0; v < V; v++) {
+            if (!inMST[v] && key[v] < min) {
+                min = key[v];
+                minIndex = v;
+            }
+        }
+        return minIndex;
+    }
+
+    // Function to print the constructed MST and its total cost
+    private void printMST(int[] parent) {
+        System.out.println("\nMinimum Spanning Tree (MST) and its total cost:");
+        int totalCost = 0;
+
+        for (int i = 1; i < V; i++) {
+            System.out.println("City " + (parent[i] + 1) + " is connected to City " + (i + 1) + " with a cost of " + graph[i][parent[i]]);
+            totalCost += graph[i][parent[i]];
+        }
+
+        System.out.println("Total cost of constructing roads: " + totalCost);
+    }
+}
+
+public class Prims {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter the number of cities: ");
+        int V = sc.nextInt();
+
+        Graph graph = new Graph(V);
+        graph.inputEdges();
+
+        graph.primMST(); // Run Prim's algorithm to find the MST
+    }
+}

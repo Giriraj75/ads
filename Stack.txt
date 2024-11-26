@@ -1,0 +1,111 @@
+import java.util.Scanner;
+
+class Node {
+    int data;
+    Node next;
+}
+
+public class Stack {
+    private Node top = null;
+    private int maxSize;
+    private int currentSize = 0;
+
+    // Constructor to set the maximum size of the stack
+    public Stack(int maxSize) {
+        this.maxSize = maxSize;
+    }
+
+    // Function to push an element onto the stack
+    public void push(int data) {
+        if (currentSize == maxSize) {
+            System.out.println("Stack Overflow! Cannot push " + data + " onto the stack.");
+            return;
+        }
+        Node temp = new Node();
+        temp.data = data;
+        temp.next = top;
+        top = temp;
+        currentSize++;
+        System.out.println("Pushed " + data + " onto the stack");
+    }
+
+    // Function to pop an element from the stack
+    public void pop() {
+        if (top == null) {
+            System.out.println("Stack Underflow");
+            return;
+        }
+        Node temp = top;
+        top = top.next;
+        currentSize--;
+        System.out.println("Popped " + temp.data + " from the stack");
+    }
+
+    // Function to peek at the top element of the stack
+    public void peek() {
+        if (top == null) {
+            System.out.println("Stack is empty, nothing to peek.");
+            return;
+        }
+        System.out.println("Top element is: " + top.data);
+    }
+
+    // Function to display the elements in the stack
+    public void display() {
+        Node temp = top;
+        if (top == null) {
+            System.out.println("Stack is empty");
+            return;
+        }
+        System.out.print("Stack elements: ");
+        while (temp != null) {
+            System.out.print(temp.data + " ");
+            temp = temp.next;
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the size of the stack: ");
+        int size = scanner.nextInt();
+
+        Stack stack = new Stack(size);
+
+        while (true) {
+            System.out.println("\nMenu:");
+            System.out.println("1. Push an element onto the stack");
+            System.out.println("2. Pop an element from the stack");
+            System.out.println("3. Peek at the top element of the stack");
+            System.out.println("4. Display stack elements");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the element to push: ");
+                    int data = scanner.nextInt();
+                    stack.push(data);
+                    break;
+                case 2:
+                    stack.pop();
+                    break;
+                case 3:
+                    stack.peek();
+                    break;
+                case 4:
+                    stack.display();
+                    break;
+                case 5:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice, please try again.");
+            }
+        }
+    }
+}

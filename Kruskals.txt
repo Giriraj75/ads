@@ -1,0 +1,123 @@
+import java.util.*;
+
+class cost {
+
+    // Edge class to represent a weighted edge
+    static class Edge implements Comparable<Edge> {
+        int src, dest, weight;
+
+        Edge(int src, int dest, int weight) {
+            this.src = src;
+            this.dest = dest;
+            this.weight = weight;
+        }
+
+        @Override
+        public int compareTo(Edge compareEdge) {
+            return this.weight - compareEdge.weight;
+        }
+    }
+
+    static class Subset {
+        int parent, rank;
+    }
+
+    private int vertices;
+    private List<Edge> edges;
+
+    cost(int vertices) {
+        this.vertices = vertices;
+        this.edges = new ArrayList<>();
+    }
+
+    public void addEdge(int src, int dest, int weight) {
+        edges.add(new Edge(src, dest, weight));
+    }
+
+    private int find(Subset[] subsets, int node) {
+        if (subsets[node].parent != node) {
+            subsets[node].parent = find(subsets, subsets[node].parent);
+        }
+        return subsets[node].parent;
+    }
+
+    private void union(Subset[] subsets, int x, int y) {
+        int rootX = find(subsets, x);
+        int rootY = find(subsets, y);
+
+        if (subsets[rootX].rank < subsets[rootY].rank) {
+            subsets[rootX].parent = rootY;
+        } else if (subsets[rootX].rank > subsets[rootY].rank) {
+            subsets[rootY].parent = rootX;
+        } else {
+            subsets[rootY].parent = rootX;
+            subsets[rootX].rank++;
+        }
+    }
+
+    public void kruskalMST() {
+        Collections.sort(edges);
+
+        Subset[] subsets = new Subset[vertices];
+        for (int i = 0; i < vertices; i++) {
+            subsets[i] = new Subset();
+            subsets[i].parent = i;
+            subsets[i].rank = 0;
+        }
+
+        List<Edge> mst = new ArrayList<>();
+        int totalCost = 0;
+
+        for (Edge edge : edges) {
+            int srcParent = find(subsets, edge.src);
+            int destParent = find(subsets, edge.dest);
+
+            if (srcParent != destParent) {
+                mst.add(edge);
+                totalCost += edge.weight;
+                union(subsets, srcParent, destParent);
+            }
+        }
+
+        System.out.println("Edges in the Minimum Spanning Tree:");
+        for (Edge edge : mst) {
+            System.out.println("City " + (edge.src + 1) + " is connected to City " + (edge.dest + 1) + " with cost " + edge.weight);
+        }
+        System.out.println("Total cost of constructing roads: " + totalCost);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of cities: ");
+        int cities = scanner.nextInt();
+
+        System.out.print("Enter the number of roads: ");
+        int roads = scanner.nextInt();
+
+        cost kruskal = new cost(cities);
+
+        System.out.println("Enter the roads in the format (source destination weight):");
+        for (int i = 0; i < roads; i++) {
+            int src = scanner.nextInt();
+            int dest = scanner.nextInt();
+            int weight = scanner.nextInt();
+
+            // Adjusting for 1-based indexing
+            if (src < 1 || dest < 1 || src > cities || dest > cities) {
+                System.out.println("Invalid edge! Source and destination must be between 1 and " + cities + ".");
+                i--; // Reattempt the same edge input
+                continue;
+            }
+
+            kruskal.addEdge(src - 1, dest - 1, weight);
+        }
+
+        System.out.println("\nConstructing Minimum Spanning Tree...");
+        kruskal.kruskalMST();
+
+        scanner.close();
+    }
+}
+
+
